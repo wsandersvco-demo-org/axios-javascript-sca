@@ -191,7 +191,7 @@ describe('services/team-service.ts', () => {
       expect(mockUpdateTeam).toHaveBeenCalledWith(
         'team-123',
         {
-          team_name: '',
+          team_name: 'New Team',
           users: [
             { user_name: 'user1@example.com', relationship: 'ADMIN' },
             { user_name: 'user2@example.com', relationship: 'MEMBER' }

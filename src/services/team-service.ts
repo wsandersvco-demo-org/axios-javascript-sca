@@ -64,7 +64,7 @@ export class TeamService {
 
     if (config.members.length > 0) {
       core.info(`Adding ${config.members.length} members to team...`)
-      await this.updateTeamMembers(team.team_id, config.members)
+      await this.updateTeamMembers(team.team_id, team.team_name, config.members)
       core.info(`Members added successfully`)
     }
 
@@ -109,12 +109,13 @@ export class TeamService {
    */
   private async updateTeamMembers(
     teamId: string,
+    teamName: string,
     members: TeamMember[]
   ): Promise<void> {
     await this.veracodeClient.updateTeam(
       teamId,
       {
-        team_name: '',
+        team_name: teamName,
         users: members.map((m) => ({
           user_name: m.user,
           relationship: m.relationship
