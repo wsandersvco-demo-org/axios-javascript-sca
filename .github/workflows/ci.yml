@@ -57,17 +57,20 @@ jobs:
         id: test-action
         uses: ./
         with:
-          build-runs-on: "[ 'ubuntu-latest' ]"
-          config-repository: select-runs-on-action
-          default-runs-on: "[ 'ubuntu-latest' ]"
+          config-repository: veracode-create-teams-action
           github-token: ${{ github.token }}
           owner: wsandersvc
           repository: verademo-java
-          runs-on-mapping-yaml: runs-on-mapping.yaml
-          ref: ${{ github.ref }}
+          veracode-api-id: ${{ secrets.VERACODE_API_ID }}
+          veracode-api-key: ${{ secrets.VERACODE_API_KEY }}
+          veracode-team-mapping-yaml: team-mapping.yaml
+          veracode-region: US
 
       - name: Print Output
         id: output
         run: |
-          echo "${{ steps.test-action.outputs.build-runs-on }}"
-          echo "${{ steps.test-action.outputs.default-runs-on }}"
+          echo "Team ID: ${{ steps.test-action.outputs.team-id }}"
+          echo "Team Name: ${{ steps.test-action.outputs.team-name }}"
+          echo "Action Taken: ${{ steps.test-action.outputs.action-taken }}"
+          echo "Members Added: ${{ steps.test-action.outputs.members-added }}"
+          echo "Members Skipped: ${{ steps.test-action.outputs.members-skipped }}"
