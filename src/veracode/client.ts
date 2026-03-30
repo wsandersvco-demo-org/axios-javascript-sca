@@ -101,7 +101,6 @@ export class VeracodeClient {
         Accept: 'application/json'
       },
       // Use qs library for RFC3986-compliant query string serialization
-      // This ensures spaces are encoded as %20 (not +) which is required for Veracode HMAC
       paramsSerializer: (params) => {
         return qs.stringify(params, {
           encode: true,
