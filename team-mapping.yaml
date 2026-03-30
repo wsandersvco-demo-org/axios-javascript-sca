@@ -14,7 +14,7 @@ defaults:
 # Key: GitHub repository name (supports wildcards with *)
 mappings:
   # Example: Specific repository configuration
-  verademo-dotnet:
+  verademo-java:
     team_name: 'VeraDemo Java Security Team'
     description: 'Security team for the VeraDemo Java application'
     business_unit: 'Demo Applications'
