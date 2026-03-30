@@ -6,7 +6,8 @@
 
 import * as core from '@actions/core'
 import { VeracodeClient } from '../veracode/client.js'
-import type { TeamConfiguration, VeracodeTeam, TeamMember } from '../types.js'
+import type { TeamConfiguration, TeamMember, VeracodeTeam } from '../types.js'
+import { sanitizeForLog } from '../utils.js'
 
 const MAX_PAGES = 100 // Safety limit for pagination
 const PAGE_SIZE = 100 // Maximum page size for efficiency
@@ -34,7 +35,9 @@ export class TeamService {
       )
 
       if (exactMatch) {
-        core.info(`Found existing team: ${teamName} (${exactMatch.team_id})`)
+        core.info(
+          `Found existing team: ${sanitizeForLog(teamName)} (${sanitizeForLog(exactMatch.team_id)})`
+        )
         return exactMatch
       }
 
@@ -60,7 +63,9 @@ export class TeamService {
       description: config.description
     })
 
-    core.info(`Team created successfully: ${team.team_name} (${team.team_id})`)
+    core.info(
+      `Team created successfully: ${sanitizeForLog(team.team_name)} (${sanitizeForLog(team.team_id)})`
+    )
 
     if (config.members.length > 0) {
       core.info(`Adding ${config.members.length} members to team...`)
@@ -82,7 +87,9 @@ export class TeamService {
     teamId: string,
     config: TeamConfiguration
   ): Promise<VeracodeTeam> {
-    core.info(`Updating team: ${config.team_name} (${teamId})`)
+    core.info(
+      `Updating team: ${sanitizeForLog(config.team_name)} (${sanitizeForLog(teamId)})`
+    )
 
     const updatedTeam = await this.veracodeClient.updateTeam(
       teamId,

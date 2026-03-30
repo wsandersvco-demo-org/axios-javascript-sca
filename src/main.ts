@@ -13,6 +13,7 @@ import { TeamService } from './services/team-service.js'
 import { UserValidator } from './services/user-validator.js'
 import type { ActionInputs, ActionOutputs, TeamConfiguration } from './types.js'
 import { executeWithRetry } from './utils/retry.js'
+import { sanitizeForLog } from './utils.js'
 import { VeracodeClient } from './veracode/client.js'
 
 type Octokit = ReturnType<typeof getOctokit>
@@ -109,8 +110,8 @@ function setOutputs(outputs: ActionOutputs): void {
   core.setOutput('skipped-users', outputs.skippedUsers.join(','))
 
   core.info('Outputs set successfully')
-  core.info(`Team ID: ${outputs.teamId}`)
-  core.info(`Team Name: ${outputs.teamName}`)
+  core.info(`Team ID: ${sanitizeForLog(outputs.teamId)}`)
+  core.info(`Team Name: ${sanitizeForLog(outputs.teamName)}`)
   core.info(`Action: ${outputs.actionTaken}`)
   core.info(`Members Added: ${outputs.membersAdded}`)
   core.info(`Members Skipped: ${outputs.membersSkipped}`)
@@ -265,7 +266,9 @@ export async function run(): Promise<void> {
         'Create team'
       )
       actionTaken = 'created'
-      core.info(`Team created: ${team.team_name} (${team.team_id})`)
+      core.info(
+        `Team created: ${sanitizeForLog(team.team_name)} (${sanitizeForLog(team.team_id)})`
+      )
       core.endGroup()
     } else if (teamConfig.members.length === 0) {
       // Skip update if there are no valid members for an existing team
@@ -276,7 +279,9 @@ export async function run(): Promise<void> {
       // Use the existing team details
       team = existingTeam
       actionTaken = 'skipped'
-      core.info(`Team unchanged: ${team.team_name} (${team.team_id})`)
+      core.info(
+        `Team unchanged: ${sanitizeForLog(team.team_name)} (${sanitizeForLog(team.team_id)})`
+      )
       core.endGroup()
     } else {
       core.startGroup('Updating existing team')
@@ -285,7 +290,9 @@ export async function run(): Promise<void> {
         'Update team'
       )
       actionTaken = 'updated'
-      core.info(`Team updated: ${team.team_name} (${team.team_id})`)
+      core.info(
+        `Team updated: ${sanitizeForLog(team.team_name)} (${sanitizeForLog(team.team_id)})`
+      )
       core.endGroup()
     }
 

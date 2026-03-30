@@ -17,6 +17,7 @@ import {
   ErrorCategory,
   categorizeError
 } from '../errors.js'
+import { sanitizeForLog } from '../utils.js'
 
 /**
  * Parameters for getting teams
@@ -239,9 +240,11 @@ export class VeracodeClient {
    */
   async createTeam(team: CreateTeamParams): Promise<VeracodeTeam> {
     try {
-      core.info(`Creating team: ${team.team_name}`)
+      core.info(`Creating team: ${sanitizeForLog(team.team_name)}`)
       const response = await this.client.post<VeracodeTeam>('/v2/teams', team)
-      core.info(`Team created successfully: ${response.data.team_id}`)
+      core.info(
+        `Team created successfully: ${sanitizeForLog(response.data.team_id)}`
+      )
       return response.data
     } catch (error) {
       throw new VeracodeActionError(
@@ -263,7 +266,7 @@ export class VeracodeClient {
     options: UpdateTeamOptions = {}
   ): Promise<VeracodeTeam> {
     try {
-      core.info(`Updating team: ${teamId}`)
+      core.info(`Updating team: ${sanitizeForLog(teamId)}`)
       const response = await this.client.put<VeracodeTeam>(
         `/v2/teams/${teamId}`,
         team,

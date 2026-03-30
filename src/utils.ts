@@ -30,3 +30,24 @@ export function interpolateTemplate(
     return variables[key] || match
   })
 }
+
+/**
+ * Sanitizes log output to prevent log injection attacks (CWE-117)
+ * Escapes control characters that could be used to forge log entries
+ * while keeping normal text readable
+ * @param input - The string to sanitize
+ * @returns Sanitized string safe for logging
+ */
+export function sanitizeForLog(input: string | undefined | null): string {
+  if (input === null || input === undefined || input === '') {
+    return ''
+  }
+
+  // Escape control characters that could break log integrity
+  // Using hex encoding for control chars (0x00-0x1F and 0x7F DEL)
+  // eslint-disable-next-line no-control-regex
+  return String(input).replace(/[\x00-\x1F\x7F]/g, (char) => {
+    const code = char.charCodeAt(0)
+    return `\\x${code.toString(16).padStart(2, '0').toUpperCase()}`
+  })
+}

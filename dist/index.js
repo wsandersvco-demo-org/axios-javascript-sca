@@ -64978,6 +64978,25 @@ function interpolateTemplate(template, variables) {
         return variables[key] || match;
     });
 }
+/**
+ * Sanitizes log output to prevent log injection attacks (CWE-117)
+ * Escapes control characters that could be used to forge log entries
+ * while keeping normal text readable
+ * @param input - The string to sanitize
+ * @returns Sanitized string safe for logging
+ */
+function sanitizeForLog(input) {
+    if (input === null || input === undefined || input === '') {
+        return '';
+    }
+    // Escape control characters that could break log integrity
+    // Using hex encoding for control chars (0x00-0x1F and 0x7F DEL)
+    // eslint-disable-next-line no-control-regex
+    return String(input).replace(/[\x00-\x1F\x7F]/g, (char) => {
+        const code = char.charCodeAt(0);
+        return `\\x${code.toString(16).padStart(2, '0').toUpperCase()}`;
+    });
+}
 
 /**
  * Configuration Resolver
@@ -69244,7 +69263,7 @@ class TeamService {
             });
             const exactMatch = response.teams.find((team) => team.team_name === teamName);
             if (exactMatch) {
-                info(`Found existing team: ${teamName} (${exactMatch.team_id})`);
+                info(`Found existing team: ${sanitizeForLog(teamName)} (${sanitizeForLog(exactMatch.team_id)})`);
                 return exactMatch;
             }
             if (response.teams.length < PAGE_SIZE)
@@ -69266,7 +69285,7 @@ class TeamService {
             member_only: config.member_only ?? false,
             description: config.description
         });
-        info(`Team created successfully: ${team.team_name} (${team.team_id})`);
+        info(`Team created successfully: ${sanitizeForLog(team.team_name)} (${sanitizeForLog(team.team_id)})`);
         if (config.members.length > 0) {
             info(`Adding ${config.members.length} members to team...`);
             await this.updateTeamMembers(team.team_id, team.team_name, config.members);
@@ -69282,7 +69301,7 @@ class TeamService {
      * @returns The updated team
      */
     async updateTeam(teamId, config) {
-        info(`Updating team: ${config.team_name} (${teamId})`);
+        info(`Updating team: ${sanitizeForLog(config.team_name)} (${sanitizeForLog(teamId)})`);
         const updatedTeam = await this.veracodeClient.updateTeam(teamId, {
             team_name: config.team_name,
             bu_name: config.business_unit,
@@ -92627,9 +92646,9 @@ class VeracodeClient {
      */
     async createTeam(team) {
         try {
-            info(`Creating team: ${team.team_name}`);
+            info(`Creating team: ${sanitizeForLog(team.team_name)}`);
             const response = await this.client.post('/v2/teams', team);
-            info(`Team created successfully: ${response.data.team_id}`);
+            info(`Team created successfully: ${sanitizeForLog(response.data.team_id)}`);
             return response.data;
         }
         catch (error) {
@@ -92641,7 +92660,7 @@ class VeracodeClient {
      */
     async updateTeam(teamId, team, options = {}) {
         try {
-            info(`Updating team: ${teamId}`);
+            info(`Updating team: ${sanitizeForLog(teamId)}`);
             const response = await this.client.put(`/v2/teams/${teamId}`, team, {
                 params: {
                     partial: options.partial ?? true,
@@ -92743,8 +92762,8 @@ function setOutputs(outputs) {
     setOutput('members-skipped', outputs.membersSkipped);
     setOutput('skipped-users', outputs.skippedUsers.join(','));
     info('Outputs set successfully');
-    info(`Team ID: ${outputs.teamId}`);
-    info(`Team Name: ${outputs.teamName}`);
+    info(`Team ID: ${sanitizeForLog(outputs.teamId)}`);
+    info(`Team Name: ${sanitizeForLog(outputs.teamName)}`);
     info(`Action: ${outputs.actionTaken}`);
     info(`Members Added: ${outputs.membersAdded}`);
     info(`Members Skipped: ${outputs.membersSkipped}`);
@@ -92853,7 +92872,7 @@ async function run() {
             startGroup('Creating new team');
             team = await executeWithRetry(() => teamService.createTeam(teamConfig), 'Create team');
             actionTaken = 'created';
-            info(`Team created: ${team.team_name} (${team.team_id})`);
+            info(`Team created: ${sanitizeForLog(team.team_name)} (${sanitizeForLog(team.team_id)})`);
             endGroup();
         }
         else if (teamConfig.members.length === 0) {
@@ -92863,14 +92882,14 @@ async function run() {
             // Use the existing team details
             team = existingTeam;
             actionTaken = 'skipped';
-            info(`Team unchanged: ${team.team_name} (${team.team_id})`);
+            info(`Team unchanged: ${sanitizeForLog(team.team_name)} (${sanitizeForLog(team.team_id)})`);
             endGroup();
         }
         else {
             startGroup('Updating existing team');
             team = await executeWithRetry(() => teamService.updateTeam(existingTeam.team_id, teamConfig), 'Update team');
             actionTaken = 'updated';
-            info(`Team updated: ${team.team_name} (${team.team_id})`);
+            info(`Team updated: ${sanitizeForLog(team.team_name)} (${sanitizeForLog(team.team_id)})`);
             endGroup();
         }
         // 9. Set outputs and write summary
