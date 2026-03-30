@@ -19,9 +19,6 @@ type PermissionLevel = 'admin' | 'write' | 'read'
 export class GitHubService {
   constructor(private octokit: GitHubClient) {}
 
-  /**
-   * Fetches collaborators from a GitHub repository
-   */
   async fetchCollaborators(
     owner: string,
     repo: string,
@@ -60,9 +57,6 @@ export class GitHubService {
     }
   }
 
-  /**
-   * Processes a single collaborator
-   */
   private async processCollaborator(
     collab: {
       login: string
@@ -89,9 +83,6 @@ export class GitHubService {
     }
   }
 
-  /**
-   * Gets permission level from permissions object
-   */
   private getPermissionLevel(permissions?: {
     admin?: boolean
     push?: boolean
@@ -102,9 +93,6 @@ export class GitHubService {
     return 'read'
   }
 
-  /**
-   * Fetches email address for a GitHub user
-   */
   private async getUserEmail(username: string): Promise<string | null> {
     try {
       const { data: user } = await this.octokit.rest.users.getByUsername({

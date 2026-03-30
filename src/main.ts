@@ -224,7 +224,7 @@ export async function run(): Promise<void> {
     core.endGroup()
 
     let team
-    let actionTaken: 'created' | 'updated'
+    let actionTaken: 'created' | 'updated' | 'skipped'
 
     if (!existingTeam) {
       core.startGroup('Creating new team')
@@ -234,6 +234,17 @@ export async function run(): Promise<void> {
       )
       actionTaken = 'created'
       core.info(`Team created: ${team.team_name} (${team.team_id})`)
+      core.endGroup()
+    } else if (teamConfig.members.length === 0) {
+      // Skip update if there are no valid members for an existing team
+      core.startGroup('Skipping team update')
+      core.info(
+        `No valid members to add. Skipping update for existing team: ${teamConfig.team_name}`
+      )
+      // Use the existing team details
+      team = existingTeam
+      actionTaken = 'skipped'
+      core.info(`Team unchanged: ${team.team_name} (${team.team_id})`)
       core.endGroup()
     } else {
       core.startGroup('Updating existing team')

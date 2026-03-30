@@ -261,6 +261,28 @@ mappings:
       expect(core.setOutput).toHaveBeenCalledWith('members-added', 0)
       expect(core.setOutput).toHaveBeenCalledWith('members-skipped', 2)
     })
+
+    it('should skip update when existing team has no valid members', async () => {
+      mockUserValidator.validateTeamMembers.mockResolvedValue({
+        validMembers: [],
+        invalidMembers: [
+          { user: 'user1@example.com', reason: 'User not found' },
+          { user: 'user2@example.com', reason: 'User inactive' }
+        ]
+      })
+      mockTeamService.findTeamByName.mockResolvedValue({
+        ...mockTeam,
+        user_count: 5
+      })
+
+      await run()
+
+      expect(mockTeamService.updateTeam).not.toHaveBeenCalled()
+      expect(core.setOutput).toHaveBeenCalledWith('action-taken', 'skipped')
+      expect(core.setOutput).toHaveBeenCalledWith('member-count', 5)
+      expect(core.setOutput).toHaveBeenCalledWith('members-added', 0)
+      expect(core.setOutput).toHaveBeenCalledWith('members-skipped', 2)
+    })
   })
 
   describe('GitHub Collaborators Integration', () => {

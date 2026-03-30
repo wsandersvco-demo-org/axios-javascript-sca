@@ -258,8 +258,8 @@ describe('services/user-validator.ts', () => {
       await validator.validateTeamMembers(members)
 
       expect(core.info).toHaveBeenCalledWith('Validation complete:')
-      expect(core.info).toHaveBeenCalledWith('  ✓ Valid members: 1')
-      expect(core.info).toHaveBeenCalledWith('  ✗ Invalid members: 1')
+      expect(core.info).toHaveBeenCalledWith('  Valid members: 1')
+      expect(core.info).toHaveBeenCalledWith('  Invalid members: 1')
     })
   })
 

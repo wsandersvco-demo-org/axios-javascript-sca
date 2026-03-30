@@ -15,17 +15,11 @@ import type {
 } from '../types.js'
 import { normalizeEmail } from '../utils.js'
 
-/**
- * Validates team members against Veracode platform
- */
 export class UserValidator {
   private userCache = new Map<string, VeracodeUser | null>()
 
   constructor(private veracodeClient: VeracodeClient) {}
 
-  /**
-   * Validates all team members against Veracode platform
-   */
   async validateTeamMembers(
     members: TeamMember[]
   ): Promise<UserValidationResult> {
@@ -47,10 +41,10 @@ export class UserValidator {
             result.veracodeUser!
           )
         })
-        core.debug(`✓ Validated user: ${member.user}`)
+        core.debug(`Validated user: ${member.user}`)
       } else {
         invalidMembers.push({ user: member.user, reason: result.reason })
-        core.warning(`✗ Invalid user: ${member.user} - ${result.reason}`)
+        core.warning(`Invalid user: ${member.user} - ${result.reason}`)
       }
     }
 
@@ -58,9 +52,6 @@ export class UserValidator {
     return { validMembers, invalidMembers }
   }
 
-  /**
-   * Determines the appropriate relationship for a user
-   */
   private determineRelationship(
     requestedRelationship: 'ADMIN' | 'MEMBER',
     user: VeracodeUser
@@ -75,16 +66,13 @@ export class UserValidator {
     return requestedRelationship
   }
 
-  /**
-   * Logs validation summary
-   */
   private logValidationSummary(
     validCount: number,
     invalidMembers: InvalidMember[]
   ): void {
     core.info('Validation complete:')
-    core.info(`  ✓ Valid members: ${validCount}`)
-    core.info(`  ✗ Invalid members: ${invalidMembers.length}`)
+    core.info(`  Valid members: ${validCount}`)
+    core.info(`  Invalid members: ${invalidMembers.length}`)
 
     if (invalidMembers.length > 0) {
       core.warning(`${invalidMembers.length} users will be skipped:`)
@@ -94,9 +82,6 @@ export class UserValidator {
     }
   }
 
-  /**
-   * Validates a single user
-   */
   private async validateUser(emailOrUsername: string): Promise<{
     valid: boolean
     reason: string
@@ -119,7 +104,6 @@ export class UserValidator {
       return { valid: true, reason: '', veracodeUser: cached }
     }
 
-    // Search for user in Veracode
     try {
       core.debug(`Checking if user exists in Veracode: ${emailOrUsername}`)
 
@@ -161,9 +145,6 @@ export class UserValidator {
     }
   }
 
-  /**
-   * Checks if a user has the Team Admin role
-   */
   private hasTeamAdminRole(user: VeracodeUser): boolean {
     return (
       user.roles?.some(
@@ -172,16 +153,10 @@ export class UserValidator {
     )
   }
 
-  /**
-   * Clears the user cache
-   */
   clearCache(): void {
     this.userCache.clear()
   }
 
-  /**
-   * Gets the size of the user cache
-   */
   getCacheSize(): number {
     return this.userCache.size
   }

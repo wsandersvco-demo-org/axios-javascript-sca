@@ -64961,9 +64961,6 @@ var jsYaml = {
 function normalizeEmail(email) {
     return email.trim().toLowerCase();
 }
-/**
- * Sleep for a specified duration
- */
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -69102,9 +69099,6 @@ class GitHubService {
     constructor(octokit) {
         this.octokit = octokit;
     }
-    /**
-     * Fetches collaborators from a GitHub repository
-     */
     async fetchCollaborators(owner, repo, filter) {
         info(`Fetching collaborators for ${owner}/${repo}`);
         try {
@@ -69131,9 +69125,6 @@ class GitHubService {
             throw error$1;
         }
     }
-    /**
-     * Processes a single collaborator
-     */
     async processCollaborator(collab, filter) {
         const permission = this.getPermissionLevel(collab.permissions);
         if (filter && !filter.includes(permission)) {
@@ -69150,9 +69141,6 @@ class GitHubService {
             relationship: permission === 'admin' ? 'ADMIN' : 'MEMBER'
         };
     }
-    /**
-     * Gets permission level from permissions object
-     */
     getPermissionLevel(permissions) {
         if (permissions?.admin)
             return 'admin';
@@ -69160,9 +69148,6 @@ class GitHubService {
             return 'write';
         return 'read';
     }
-    /**
-     * Fetches email address for a GitHub user
-     */
     async getUserEmail(username) {
         try {
             const { data: user } = await this.octokit.rest.users.getByUsername({
@@ -69203,18 +69188,11 @@ class GitHubService {
  */
 const MAX_PAGES = 100; // Safety limit for pagination
 const PAGE_SIZE = 100; // Maximum page size for efficiency
-/**
- * Service for managing Veracode teams
- */
 class TeamService {
     veracodeClient;
     constructor(veracodeClient) {
         this.veracodeClient = veracodeClient;
     }
-    /**
-     * Finds a team by exact name match
-     * Returns null if team not found
-     */
     async findTeamByName(teamName) {
         info(`Searching for team: ${teamName}`);
         for (let page = 0; page < MAX_PAGES; page++) {
@@ -69234,9 +69212,6 @@ class TeamService {
         info(`Team not found: ${teamName}`);
         return null;
     }
-    /**
-     * Creates a new team with the specified configuration
-     */
     async createTeam(config) {
         info(`Creating new team: ${config.team_name}`);
         const team = await this.veracodeClient.createTeam({
@@ -69253,9 +69228,6 @@ class TeamService {
         }
         return team;
     }
-    /**
-     * Updates an existing team incrementally
-     */
     async updateTeam(teamId, config) {
         info(`Updating team: ${config.team_name} (${teamId})`);
         const updatedTeam = await this.veracodeClient.updateTeam(teamId, {
@@ -69274,9 +69246,6 @@ class TeamService {
         info(`Team updated successfully: ${config.members.length} members processed`);
         return updatedTeam;
     }
-    /**
-     * Updates team members incrementally
-     */
     async updateTeamMembers(teamId, teamName, members) {
         await this.veracodeClient.updateTeam(teamId, {
             team_name: teamName,
@@ -69289,9 +69258,6 @@ class TeamService {
             incremental: true
         });
     }
-    /**
-     * Creates or updates a team based on whether it exists
-     */
     async createOrUpdateTeam(config) {
         const existingTeam = await this.findTeamByName(config.team_name);
         if (existingTeam) {
@@ -69309,18 +69275,12 @@ class TeamService {
  * CRITICAL: The Veracode API will fail if you attempt to add users that don't
  * exist in the platform. This service validates all users before team operations.
  */
-/**
- * Validates team members against Veracode platform
- */
 class UserValidator {
     veracodeClient;
     userCache = new Map();
     constructor(veracodeClient) {
         this.veracodeClient = veracodeClient;
     }
-    /**
-     * Validates all team members against Veracode platform
-     */
     async validateTeamMembers(members) {
         info(`Validating ${members.length} team members against Veracode platform...`);
         const validMembers = [];
@@ -69332,19 +69292,16 @@ class UserValidator {
                     user: result.veracodeUser.user_name,
                     relationship: this.determineRelationship(member.relationship, result.veracodeUser)
                 });
-                debug(`✓ Validated user: ${member.user}`);
+                debug(`Validated user: ${member.user}`);
             }
             else {
                 invalidMembers.push({ user: member.user, reason: result.reason });
-                warning(`✗ Invalid user: ${member.user} - ${result.reason}`);
+                warning(`Invalid user: ${member.user} - ${result.reason}`);
             }
         }
         this.logValidationSummary(validMembers.length, invalidMembers);
         return { validMembers, invalidMembers };
     }
-    /**
-     * Determines the appropriate relationship for a user
-     */
     determineRelationship(requestedRelationship, user) {
         if (requestedRelationship === 'ADMIN' && !this.hasTeamAdminRole(user)) {
             warning(`User ${user.user_name} does not have the 'Team Admin' role. ` +
@@ -69353,13 +69310,10 @@ class UserValidator {
         }
         return requestedRelationship;
     }
-    /**
-     * Logs validation summary
-     */
     logValidationSummary(validCount, invalidMembers) {
         info('Validation complete:');
-        info(`  ✓ Valid members: ${validCount}`);
-        info(`  ✗ Invalid members: ${invalidMembers.length}`);
+        info(`  Valid members: ${validCount}`);
+        info(`  Invalid members: ${invalidMembers.length}`);
         if (invalidMembers.length > 0) {
             warning(`${invalidMembers.length} users will be skipped:`);
             invalidMembers.forEach((invalid) => {
@@ -69367,9 +69321,6 @@ class UserValidator {
             });
         }
     }
-    /**
-     * Validates a single user
-     */
     async validateUser(emailOrUsername) {
         const normalizedKey = normalizeEmail(emailOrUsername);
         // Check cache first
@@ -69386,7 +69337,6 @@ class UserValidator {
             }
             return { valid: true, reason: '', veracodeUser: cached };
         }
-        // Search for user in Veracode
         try {
             debug(`Checking if user exists in Veracode: ${emailOrUsername}`);
             const response = await this.veracodeClient.getUsers({
@@ -69419,21 +69369,12 @@ class UserValidator {
             };
         }
     }
-    /**
-     * Checks if a user has the Team Admin role
-     */
     hasTeamAdminRole(user) {
         return (user.roles?.some((role) => role.role_name?.toLowerCase() === 'teamadmin') ?? false);
     }
-    /**
-     * Clears the user cache
-     */
     clearCache() {
         this.userCache.clear();
     }
-    /**
-     * Gets the size of the user cache
-     */
     getCacheSize() {
         return this.userCache.size;
     }
@@ -92774,6 +92715,16 @@ async function run() {
             team = await executeWithRetry(() => teamService.createTeam(teamConfig), 'Create team');
             actionTaken = 'created';
             info(`Team created: ${team.team_name} (${team.team_id})`);
+            endGroup();
+        }
+        else if (teamConfig.members.length === 0) {
+            // Skip update if there are no valid members for an existing team
+            startGroup('Skipping team update');
+            info(`No valid members to add. Skipping update for existing team: ${teamConfig.team_name}`);
+            // Use the existing team details
+            team = existingTeam;
+            actionTaken = 'skipped';
+            info(`Team unchanged: ${team.team_name} (${team.team_id})`);
             endGroup();
         }
         else {

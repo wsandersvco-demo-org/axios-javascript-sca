@@ -2,9 +2,6 @@
  * Type definitions for Veracode Create Teams Action
  */
 
-/**
- * Configuration for a team in Veracode
- */
 export interface TeamConfiguration {
   team_name: string
   description?: string
@@ -15,17 +12,11 @@ export interface TeamConfiguration {
   github_collaborator_filter?: ('admin' | 'write' | 'read')[]
 }
 
-/**
- * Team member with role
- */
 export interface TeamMember {
   user: string // Email or username
   relationship: 'ADMIN' | 'MEMBER'
 }
 
-/**
- * Complete team mapping schema
- */
 export interface TeamMapping {
   version: string
   defaults?: DefaultSettings
@@ -33,9 +24,6 @@ export interface TeamMapping {
   fallback?: FallbackConfiguration
 }
 
-/**
- * Default settings applied to all teams
- */
 export interface DefaultSettings {
   business_unit?: string
   member_only?: boolean
@@ -43,9 +31,6 @@ export interface DefaultSettings {
   incremental_updates?: boolean
 }
 
-/**
- * Fallback configuration when no mapping matches
- */
 export interface FallbackConfiguration {
   auto_create: boolean
   team_name_template?: string
@@ -95,17 +80,11 @@ export interface UserValidationResult {
   invalidMembers: InvalidMember[]
 }
 
-/**
- * Invalid member with reason
- */
 export interface InvalidMember {
   user: string
   reason: string
 }
 
-/**
- * Action inputs
- */
 export interface ActionInputs {
   githubToken: string
   veracodeApiId: string
@@ -118,14 +97,11 @@ export interface ActionInputs {
   veracodeRegion: 'US' | 'EU' | 'FEDERAL'
 }
 
-/**
- * Action outputs
- */
 export interface ActionOutputs {
   teamId: string
   teamName: string
   teamLegacyId: number
-  actionTaken: 'created' | 'updated'
+  actionTaken: 'created' | 'updated' | 'skipped'
   memberCount: number
   membersAdded: number
   membersSkipped: number

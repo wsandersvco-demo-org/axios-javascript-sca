@@ -11,16 +11,9 @@ import type { TeamConfiguration, VeracodeTeam, TeamMember } from '../types.js'
 const MAX_PAGES = 100 // Safety limit for pagination
 const PAGE_SIZE = 100 // Maximum page size for efficiency
 
-/**
- * Service for managing Veracode teams
- */
 export class TeamService {
   constructor(private veracodeClient: VeracodeClient) {}
 
-  /**
-   * Finds a team by exact name match
-   * Returns null if team not found
-   */
   async findTeamByName(teamName: string): Promise<VeracodeTeam | null> {
     core.info(`Searching for team: ${teamName}`)
 
@@ -47,9 +40,6 @@ export class TeamService {
     return null
   }
 
-  /**
-   * Creates a new team with the specified configuration
-   */
   async createTeam(config: TeamConfiguration): Promise<VeracodeTeam> {
     core.info(`Creating new team: ${config.team_name}`)
 
@@ -71,9 +61,6 @@ export class TeamService {
     return team
   }
 
-  /**
-   * Updates an existing team incrementally
-   */
   async updateTeam(
     teamId: string,
     config: TeamConfiguration
@@ -104,9 +91,6 @@ export class TeamService {
     return updatedTeam
   }
 
-  /**
-   * Updates team members incrementally
-   */
   private async updateTeamMembers(
     teamId: string,
     teamName: string,
@@ -128,9 +112,6 @@ export class TeamService {
     )
   }
 
-  /**
-   * Creates or updates a team based on whether it exists
-   */
   async createOrUpdateTeam(
     config: TeamConfiguration
   ): Promise<{ team: VeracodeTeam; action: 'created' | 'updated' }> {
