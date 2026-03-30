@@ -679,7 +679,7 @@ for details.
 
 If you encounter issues:
 
-1. Check the [Troubleshooting](#-troubleshooting) section
+1. Check the [Troubleshooting](#troubleshooting) section
 1. Review
    [GitHub Issues](https://github.com/your-org/veracode-create-teams-action/issues)
 1. Open a new issue with:
