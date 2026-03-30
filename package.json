@@ -1,7 +1,7 @@
 {
   "name": "veracode-create-teams-action",
   "description": "Automatically create and manage Veracode teams based on repository configurations",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "William Sanders",
   "type": "module",
   "private": true,
