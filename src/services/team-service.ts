@@ -21,7 +21,7 @@ export class TeamService {
    * @returns The team if found, null otherwise
    */
   async findTeamByName(teamName: string): Promise<VeracodeTeam | null> {
-    core.info(`Searching for team: ${teamName}`)
+    core.info(`Searching for team: ${sanitizeForLog(teamName)}`)
 
     for (let page = 0; page < MAX_PAGES; page++) {
       const response = await this.veracodeClient.getTeams({
@@ -44,7 +44,7 @@ export class TeamService {
       if (response.teams.length < PAGE_SIZE) break
     }
 
-    core.info(`Team not found: ${teamName}`)
+    core.info(`Team not found: ${sanitizeForLog(teamName)}`)
     return null
   }
 
@@ -54,7 +54,7 @@ export class TeamService {
    * @returns The newly created team
    */
   async createTeam(config: TeamConfiguration): Promise<VeracodeTeam> {
-    core.info(`Creating new team: ${config.team_name}`)
+    core.info(`Creating new team: ${sanitizeForLog(config.team_name)}`)
 
     const team = await this.veracodeClient.createTeam({
       team_name: config.team_name,

@@ -82,24 +82,24 @@ describe('utils.ts', () => {
   })
 
   describe('sanitizeForLog', () => {
-    it('should escape carriage return characters using hex encoding', () => {
+    it('should remove carriage return characters', () => {
       const input = 'Hello\rWorld'
       const result = sanitizeForLog(input)
-      expect(result).toBe('Hello\\x0DWorld')
+      expect(result).toBe('HelloWorld')
       expect(result).not.toContain('\r')
     })
 
-    it('should escape line feed characters using hex encoding', () => {
+    it('should remove line feed characters', () => {
       const input = 'Hello\nWorld'
       const result = sanitizeForLog(input)
-      expect(result).toBe('Hello\\x0AWorld')
+      expect(result).toBe('HelloWorld')
       expect(result).not.toContain('\n')
     })
 
-    it('should escape both CRLF sequences', () => {
+    it('should remove both CRLF sequences', () => {
       const input = 'Hello\r\nWorld'
       const result = sanitizeForLog(input)
-      expect(result).toBe('Hello\\x0D\\x0AWorld')
+      expect(result).toBe('HelloWorld')
       expect(result).not.toContain('\r')
       expect(result).not.toContain('\n')
     })
@@ -107,7 +107,7 @@ describe('utils.ts', () => {
     it('should handle multiple newlines and carriage returns', () => {
       const input = 'Line1\nLine2\rLine3\r\nLine4'
       const result = sanitizeForLog(input)
-      expect(result).toBe('Line1\\x0ALine2\\x0DLine3\\x0D\\x0ALine4')
+      expect(result).toBe('Line1Line2Line3Line4')
       expect(result).not.toContain('\n')
       expect(result).not.toContain('\r')
     })
@@ -137,8 +137,8 @@ describe('utils.ts', () => {
       // Simulated attack: injecting fake log entries
       const maliciousInput = 'user123\n[INFO] Fake admin login successful'
       const result = sanitizeForLog(maliciousInput)
-      // Only newline is escaped, brackets and spaces are preserved for readability
-      expect(result).toBe('user123\\x0A[INFO] Fake admin login successful')
+      // Newlines are removed to prevent log forging
+      expect(result).toBe('user123[INFO] Fake admin login successful')
       expect(result).not.toContain('\n')
       expect(result).not.toContain('\r')
     })
@@ -147,11 +147,19 @@ describe('utils.ts', () => {
       const maliciousInput =
         'TeamName\r\n2026-03-30 ERROR: System compromised\r\n'
       const result = sanitizeForLog(maliciousInput)
-      // ESAPI hex-encodes spaces, hyphens, and colons as well as control chars
+      // All CR/LF are removed
       expect(result).not.toContain('\n')
       expect(result).not.toContain('\r')
-      expect(result).toContain('\\x0A')
-      expect(result).toContain('\\x0D')
+      expect(result).toBe('TeamName2026-03-30 ERROR: System compromised')
+    })
+
+    it('should replace other control characters with spaces', () => {
+      // Test null byte, backspace, and other control chars
+      const input = 'Text\x00with\x08control\x1Bchars'
+      const result = sanitizeForLog(input)
+      expect(result).toBe('Text with control chars')
+      // eslint-disable-next-line no-control-regex
+      expect(result).not.toMatch(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/)
     })
   })
 })

@@ -33,8 +33,8 @@ export function interpolateTemplate(
 
 /**
  * Sanitizes log output to prevent log injection attacks (CWE-117)
- * Escapes control characters that could be used to forge log entries
- * while keeping normal text readable
+ * Removes or escapes control characters that could be used to forge log entries
+ * Specifically targets newline, carriage return, and other control characters
  * @param input - The string to sanitize
  * @returns Sanitized string safe for logging
  */
@@ -43,11 +43,17 @@ export function sanitizeForLog(input: string | undefined | null): string {
     return ''
   }
 
-  // Escape control characters that could break log integrity
-  // Using hex encoding for control chars (0x00-0x1F and 0x7F DEL)
+  // Convert to string and remove/replace dangerous characters
+  let sanitized = String(input)
+
+  // Remove carriage return and line feed to prevent log forging
+  sanitized = sanitized.replace(/\r/g, '')
+  sanitized = sanitized.replace(/\n/g, '')
+
+  // Replace other control characters with space to maintain readability
+  // Control chars: 0x00-0x1F (except \t which is safe) and 0x7F DEL
   // eslint-disable-next-line no-control-regex
-  return String(input).replace(/[\x00-\x1F\x7F]/g, (char) => {
-    const code = char.charCodeAt(0)
-    return `\\x${code.toString(16).padStart(2, '0').toUpperCase()}`
-  })
+  sanitized = sanitized.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, ' ')
+
+  return sanitized
 }

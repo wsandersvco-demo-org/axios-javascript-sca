@@ -274,7 +274,7 @@ export async function run(): Promise<void> {
       // Skip update if there are no valid members for an existing team
       core.startGroup('Skipping team update')
       core.info(
-        `No valid members to add. Skipping update for existing team: ${teamConfig.team_name}`
+        `No valid members to add. Skipping update for existing team: ${sanitizeForLog(teamConfig.team_name)}`
       )
       // Use the existing team details
       team = existingTeam
