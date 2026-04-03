@@ -11,5 +11,5 @@ jobs:
       - run: npm ci && npm run bundle
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Rebuild dist files"
-          file_pattern: "dist/*"
+          commit_message: 'Rebuild dist files'
+          file_pattern: 'dist/*'
