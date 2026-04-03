@@ -378,7 +378,7 @@ veracode-region: EU
 | `team-id`         | UUID of the created/updated team                  | `550e8400-e29b-41d4-a716-446655440000` |
 | `team-name`       | Name of the created/updated team                  | `My Application Security Team`         |
 | `team-legacy-id`  | Legacy ID of the team                             | `12345`                                |
-| `action-taken`    | Action performed                                  | `created` or `updated` or `skipped`                 |
+| `action-taken`    | Action performed                                  | `created` or `updated` or `skipped`    |
 | `member-count`    | Total number of members in the team               | `5`                                    |
 | `members-added`   | Number of members successfully added/validated    | `3`                                    |
 | `members-skipped` | Number of members skipped (not found in Veracode) | `2`                                    |
@@ -612,7 +612,8 @@ mappings:
 
 - **GitHub Token:**
   - `repo` scope for reading repository collaborators and content
-  - The default `GITHUB_TOKEN` provided by GitHub Actions has sufficient permissions
+  - The default `GITHUB_TOKEN` provided by GitHub Actions has sufficient
+    permissions
 
 ### Security Considerations
 
