@@ -323,8 +323,7 @@ Secrets.
 
 **Permissions Required:**
 
-- `Team Admin` role or equivalent
-- `teams:read` and `teams:write` permissions
+- `Administrator` role
 
 **Example:**
 
@@ -352,7 +351,7 @@ The repository containing the `team-mapping.yaml` configuration file.
 **Example:**
 
 ```yaml
-config-repository: .security-config
+config-repository: security-config
 ```
 
 #### `veracode-region`
@@ -605,8 +604,7 @@ mappings:
 
 - **Veracode API Credentials:**
   - API ID and API Key
-  - Team Admin role or equivalent permissions
-  - `teams:read` and `teams:write` permissions
+  - Administrator permissions (to create teams)
 
 ### GitHub Requirements
 
