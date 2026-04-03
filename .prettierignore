@@ -5,3 +5,4 @@ node_modules/
 coverage/
 __fixtures__/*.yaml
 team-mapping.yaml
+veracode.yml

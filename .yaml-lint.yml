@@ -13,3 +13,4 @@ rules:
 ignore:
   - .licenses/
   - __fixtures__/
+  - veracode.yml
