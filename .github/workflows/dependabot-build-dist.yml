@@ -38,7 +38,7 @@ jobs:
 
       - name: Commit Updated dist/
         id: commit
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: 'chore: rebuild dist/ after dependency updates'
           file_pattern: 'dist/*'
