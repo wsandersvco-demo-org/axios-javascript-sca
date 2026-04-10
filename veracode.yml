@@ -35,7 +35,7 @@ veracode_static_scan:
   break_build_on_error: false
   error_message: 'Veracode static scan faced a problem. Please contact your Veracode administrator for more information.'
   # Default policy to be used if a policy isn't already assigned to the application profile.
-  policy: Auto-Update PCI (Latest version of OWASP, CWE Top 25, and CERT)
+  policy: Auto-Update PCI (Latest version of OWASP, CWE Top 25, and CERT) + SCA + Container
   # If the create_code_scanning_alert is set to true, GitHub security code scanning vulnerability alerts will be created for static findings.
   create_code_scanning_alert: true
   # If the create_issue is set to true, GitHub Issues will be created for static findings.
@@ -95,7 +95,7 @@ veracode_iac_secrets_scan:
       - default_branch
   # If break_build_policy_findings is set to true, the build will break when findings violate the policy.
   break_build_policy_findings: true
-  policy: Auto-Update PCI (Latest version of OWASP, CWE Top 25, and CERT)
+  policy: Auto-Update PCI (Latest version of OWASP, CWE Top 25, and CERT) + SCA + Container
   # If the break_build_on_error is set to true, the build will break if the scan failed to complete or with an error, no libraries were found,
   # or no build system was found and the error_message will be displayed.
   break_build_on_error: true
